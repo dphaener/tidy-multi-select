@@ -88,7 +88,7 @@
       self.$control.removeClass("open");
     });
 
-    $("body").on("click", ".ts-control", function(e) {
+    $("body").on("click", ".ts-control .ts-popover", function(e) {
       e.stopPropagation();
     });
 
@@ -107,6 +107,7 @@
     }
 
   , open: function() {
+      $(".ts-control").removeClass("open");
       this.$control.addClass("open");
     }
 
