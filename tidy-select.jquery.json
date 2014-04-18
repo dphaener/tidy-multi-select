@@ -1,0 +1,21 @@
+{
+  "name": "tidy-select",
+  "title": "Tidy Select",
+  "description": "A simple jQuery select box plugin",
+  "author": {
+    "name": "Derrick Reimer"
+  },
+  "version": "0.0.1",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/djreimer/tidy-select/blob/master/LICENSE.txt"
+    }
+  ],
+  "bugs": "https://github.com/djreimer/tidy-select/issues",
+  "homepage": "https://github.com/djreimer/tidy-select",
+  "docs": "https://github.com/djreimer/tidy-select",
+  "dependencies": {
+    "jquery": ">=1.5"
+  }
+}
