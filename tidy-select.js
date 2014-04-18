@@ -84,6 +84,14 @@
     self.$control = $("<div class='ts-control'></div>");
     self.render();
 
+    $("html").on("click", function() {
+      self.$control.removeClass("open");
+    });
+
+    $("body").on("click", ".ts-control", function(e) {
+      e.stopPropagation();
+    });
+
     self.$el.on("change", function() {
       self.update();
     });
