@@ -96,6 +96,12 @@
       self.update();
     });
 
+    self.$control.on("click", function(e) {
+      e.preventDefault();
+      self.toggle();
+      return false;
+    });
+
     self.update();
   }
 
@@ -126,6 +132,31 @@
       this.$options.find("li[data-value='" + value + "']").addClass("selected");
     }
 
+  , reset: function(options) {
+      options || (options = []);
+      var selected = this.$el.val();
+      this.$el.html(""); // remove existing options
+      this.$el.append("<option value='' selected='selected'>" + this.defaultText + "</option>");
+
+      for (var i = 0; i < options.length; i++) {
+        var option = options[i];
+        $optionEl = $("<option></option>");
+
+        if (option.value) {
+          $optionEl.val(option.value);
+        }
+        
+        if (option.title) {
+          $optionEl.html(option.title);
+        }
+
+        this.$el.append($optionEl);
+      }
+
+      this.render();
+      this.$el.val(selected);
+    }
+
   , render: function() {
       var self = this;
       self.$control.html("");
@@ -151,12 +182,6 @@
       self.$control.append(self.$dropdown);
       self.$control.append(self.$popover);
 
-      self.$control.on("click", function(e) {
-        e.preventDefault();
-        self.toggle();
-        return false;
-      });
-
       self.$el.after(self.$control);
 
       if (self.width == "inherit") {
@@ -166,15 +191,20 @@
       }
 
       self.$el.css("display", "none");
+      self.update();
     }
   }
   
   $.fn.tidySelect = function(options) {
+    var args = Array.prototype.slice.call(arguments);
+
     return this.each(function() {
       var $this = $(this)
         , data = $this.data('tidySelect');
       if (!data) $this.data('tidySelect', (data = new Control(this, options)));
-      if (typeof options == 'string') return data[options].call(data);
+      if (typeof options == 'string') {
+        return data[options].apply(data, args.slice(1));
+      }
     });
   }
 }(jQuery, window, document));
