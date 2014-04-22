@@ -76,12 +76,13 @@
   var Control = function(el, options) {
     var self = this;
 
-    self.options = options || {};
-    self.defaultText = self.options.defaultText || "Choose an item...";
-    self.width = self.options.width || "inherit";
-
     self.$el = $(el);
     self.$control = $("<div class='ts-control'></div>");
+
+    self.options = options || {};
+    self.defaultText = self.options.defaultText || "Choose an item...";
+    self.width = self.options.width || self.$el.data("width") || "auto";
+
     self.render();
 
     $("html").on("click", function() {
@@ -150,6 +151,10 @@
           $optionEl.html(option.title);
         }
 
+        if (option.description) {
+          $optionEl.data("description", option.description);
+        }
+
         this.$el.append($optionEl);
       }
 
@@ -160,6 +165,9 @@
   , render: function() {
       var self = this;
       self.$control.html("");
+
+      // Inherit class list from the original "select"
+      self.$control.attr("class", "ts-control " + self.$el.attr("class"));
 
       self.$dropdown = $("<a href='#' class='ts-dropdown'></a>");
       self.$popover = $("<div class='ts-popover'></div>");
@@ -186,7 +194,7 @@
 
       if (self.width == "inherit") {
         self.$control.css("width", self.$el.width());
-      } else {
+      } else if (self.width != "auto") {
         self.$control.css("width", self.width);
       }
 
