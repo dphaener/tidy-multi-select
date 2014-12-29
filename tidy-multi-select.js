@@ -1,8 +1,8 @@
 /* =====================================================================
- * tidy-select.js v0.0.1
- * http://github.com/djreimer/tidy-select
+ * tidy-multi-select.js v0.0.1
+ * http://github.com/dphaener/tidy-multi-select
  * =====================================================================
- * Copyright (c) 2014 Derrick Reimer
+ * Copyright (c) 2014 Darin Haener
  * 
  * MIT License
  * 
@@ -37,14 +37,17 @@
   Option.prototype = {
     constructor: Option
 
-  , select: function() {
+  , updateSelected: function() {
       var $select = this.$el.parent();
-      $select.val(this.$el.val());
       $select.trigger("change");
     }
 
   , value: function() {
       return this.$el.val();
+    }
+
+  , checked: function() {
+      return this.$el.data("checked")
     }
 
   , title: function() {
@@ -57,16 +60,22 @@
 
   , render: function() {
       var self = this;
+      var checked = typeof(this.checked()) == "undefined" ? "" : "checked";
+
       self.$option = $("<li data-value='" + this.value() + "'></li>");
-      self.$option.append("<span class='ts-title'>" + this.title() + "</span>");
+      self.$option.append("<input class='tms-input' type='checkbox' " + checked + "/>");
+      self.$option.append("<span class='tms-title'>" + this.title() + "</span>");
 
       if (this.description()) {
-        self.$option.append("<span class='ts-description'>" + this.description() + "</span>");
+        self.$option.append("<span class='tms-description'>" + this.description() + "</span>");
       }
 
-      self.$option.on("click", function(e) {
-        e.preventDefault();
-        self.select();
+      self.$checkbox = self.$option.find("input");
+
+      self.$checkbox.on("click", function(e) {
+        e.stopPropagation();
+        $(this).prop("checked", $(this).prop("checked"));
+        self.updateSelected();
       });
 
       return self.$option;
@@ -77,11 +86,13 @@
     var self = this;
 
     self.$el = $(el);
-    self.$control = $("<div class='ts-control'></div>");
+    self.$control = $("<div class='tms-control'></div>");
 
     self.options = options || {};
     self.defaultText = self.options.defaultText || "Choose an item...";
     self.width = self.options.width || self.$el.data("width") || "auto";
+    self.customMultiText = self.options.customMultiText || false;
+    if (self.customMultiText) self.multiText = self.options.multiText || "Multiple selected...";
 
     self.render();
 
@@ -89,7 +100,7 @@
       self.$control.removeClass("open");
     });
 
-    $("body").on("click", ".ts-control .ts-popover", function(e) {
+    $("body").on("click", ".tms-control .tms-popover", function(e) {
       e.stopPropagation();
     });
 
@@ -114,7 +125,7 @@
     }
 
   , open: function() {
-      $(".ts-control").removeClass("open");
+      $(".tms-control").removeClass("open");
       this.$control.addClass("open");
     }
 
@@ -123,14 +134,30 @@
     }
 
   , update: function() {
-      var $option = this.$el.find("option:selected");
-      var text = $option.text();
-      var value = $option.val();
-      if (!text || text == "") text = this.defaultText;
+      var $checked = this.$options.find("input:checked").parent("li");
+      var selectedValues = [];
+      var selectedTexts = [];
+
+      $checked.each(function (i) {
+        $el = $(this);
+        value = $el.data("value");
+        text = $el.find(".tms-title").html();
+        selectedValues.push(value);
+        selectedTexts.push(text);
+      });
+
+      this.$el.data("values", selectedValues);
+
+      var text = selectedTexts.join(", ");
+
+      if (!text || text == "") {
+        text = this.defaultText;
+      }
+      else if (this.customMultiText && selectedValues.length > 1) {
+        text = this.multiText;
+      }
 
       this.$dropdown.html(text);
-      this.$options.find("li").removeClass("selected");
-      this.$options.find("li[data-value='" + value + "']").addClass("selected");
     }
 
   , reset: function(options) {
@@ -167,11 +194,11 @@
       self.$control.html("");
 
       // Inherit class list from the original "select"
-      self.$control.attr("class", "ts-control " + self.$el.attr("class"));
+      self.$control.attr("class", "tms-control " + self.$el.attr("class"));
 
-      self.$dropdown = $("<a href='#' class='ts-dropdown'></a>");
-      self.$popover = $("<div class='ts-popover'></div>");
-      self.$options = $("<ul class='ts-options'></ul>");
+      self.$dropdown = $("<a href='#' class='tms-dropdown'></a>");
+      self.$popover = $("<div class='tms-popover'></div>");
+      self.$options = $("<ul class='tms-options'></ul>");
 
       self.$el.find("option").each(function() {
         var $option = $(this);
@@ -203,13 +230,13 @@
     }
   }
   
-  $.fn.tidySelect = function(options) {
+  $.fn.tidyMultiSelect = function(options) {
     var args = Array.prototype.slice.call(arguments);
 
     return this.each(function() {
       var $this = $(this)
-        , data = $this.data('tidySelect');
-      if (!data) $this.data('tidySelect', (data = new Control(this, options)));
+        , data = $this.data('tidyMultiSelect');
+      if (!data) $this.data('tidyMultiSelect', (data = new Control(this, options)));
       if (typeof options == 'string') {
         return data[options].apply(data, args.slice(1));
       }

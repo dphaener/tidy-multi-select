@@ -1,6 +1,6 @@
-# Tidy Select
+# Tidy Multi Select
 
-A simple jQuery select box plugin.
+A simple jQuery multi select box plugin.
 
 ## Usage
 

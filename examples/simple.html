@@ -4,19 +4,21 @@
   <title>Simple Example - Tidy Date Range</title>
   <link rel="stylesheet" type="text/css" href="simple.css">
   <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
-  <script type="text/javascript" src="../tidy-select.js"></script>
+  <script type="text/javascript" src="../tidy-multi-select.js"></script>
 </head>
 <body>
   <select class="fruit" style="width: 300px">
-    <option value="apple" data-description="A very nice fruit">Apple</option>
+    <option value="apple" data-description="A very nice fruit" data-checked>Apple</option>
     <option value="orange">Orange</option>
     <option value="banana">Banana</option>
   </select>
 
   <script type="text/javascript">
     $(function() {
-      $(".fruit").tidySelect({
-        width: 250
+      $(".fruit").tidyMultiSelect({
+        width: 250,
+        customMultiText: true,
+        multiText: "Multiple fruits chosen..."
       });
     });
   </script>
