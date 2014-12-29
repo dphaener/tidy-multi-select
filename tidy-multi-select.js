@@ -93,11 +93,14 @@
     self.width = self.options.width || self.$el.data("width") || "auto";
     self.customMultiText = self.options.customMultiText || false;
     if (self.customMultiText) self.multiText = self.options.multiText || "Multiple selected...";
+    self.customEvent = self.options.customEvent || "submit";
+    self.selectedValues = [];
 
     self.render();
 
     $("html").on("click", function() {
       self.$control.removeClass("open");
+      if (self.previousValues != self.selectedValues) self.$el.trigger(self.customEvent);
     });
 
     $("body").on("click", ".tms-control .tms-popover", function(e) {
@@ -115,6 +118,7 @@
     });
 
     self.update();
+    self.previousValues = self.selectedValues;
   }
 
   Control.prototype = {
@@ -122,6 +126,7 @@
 
   , close: function() {
       this.$control.removeClass("open");
+      if (this.previousValues != this.selectedValues) this.$el.trigger(this.customEvent);
     }
 
   , open: function() {
@@ -146,6 +151,8 @@
         selectedTexts.push(text);
       });
 
+      this.previousValues = this.selectedValues;
+      this.selectedValues = selectedValues;
       this.$el.data("values", selectedValues);
 
       var text = selectedTexts.join(", ");
