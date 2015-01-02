@@ -61,20 +61,24 @@
   , render: function() {
       var self = this;
       var checked = typeof(this.checked()) == "undefined" ? "" : "checked";
+      var input = "<input class='tms-input' type='checkbox' id='" + this.value() + "' " + checked + "/>";
+      var title = "<span class='tms-title'>" + this.title() + "</span>";
 
       self.$option = $("<li data-value='" + this.value() + "'></li>");
-      self.$option.append("<input class='tms-input' type='checkbox' " + checked + "/>");
-      self.$option.append("<span class='tms-title'>" + this.title() + "</span>");
+      self.$label = $("<label for='" + this.value() + "'></label>");
+      self.$label.append(input);
+      self.$label.append(title);
 
       if (this.description()) {
-        self.$option.append("<span class='tms-description'>" + this.description() + "</span>");
+        self.$label.append("<span class='tms-description'>" + this.description() + "</span>");
       }
 
-      self.$checkbox = self.$option.find("input");
+      self.$option.append(self.$label[0].outerHTML);
 
-      self.$checkbox.on("click", function(e) {
-        e.stopPropagation();
-        $(this).prop("checked", $(this).prop("checked"));
+      self.$checkbox = self.$option.find("input");
+      self.$label = self.$option.find("label");
+
+      self.$checkbox.on("change", function(e) {
         self.updateSelected();
       });
 
@@ -87,6 +91,7 @@
 
     self.$el = $(el);
     self.$control = $("<div class='tms-control'></div>");
+    self.$dropdown = self.$control.find(".tms-dropdown");
 
     self.options = options || {};
     self.defaultText = self.options.defaultText || "Choose an item...";
@@ -111,7 +116,7 @@
       self.update();
     });
 
-    self.$control.on("click", function(e) {
+    self.$dropdown.on("click", function(e) {
       e.preventDefault();
       self.toggle();
       return false;
@@ -139,7 +144,8 @@
     }
 
   , update: function() {
-      var $checked = this.$options.find("input:checked").parent("li");
+      var $checked = this.$options.find("input:checked").parents("li");
+      console.log(this.$options);
       var selectedValues = [];
       var selectedTexts = [];
 
